@@ -1,0 +1,293 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  FARMER
+  BUYER
+  CONSUMER
+  CERTIFIER
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum BatchStatus {
+  CREATED
+  CERTIFIED
+  PROCESSING
+  PACKAGED
+  IN_TRANSIT
+  DELIVERED
+  COMPLETED
+}
+
+enum OrderStatus {
+  INITIATED
+  ESCROW_PENDING
+  ESCROW_FUNDED
+  OWNERSHIP_TRANSFERRED
+  COMPLETED
+  CANCELLED
+}
+
+enum EscrowStatus {
+  PENDING
+  RELEASED
+  REFUNDED
+}
+
+enum TransactionStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+}
+
+model User {
+  id                String                  @id @default(uuid())
+  email             String                  @unique
+  passwordHash      String
+  name              String
+  role              Role
+  walletAddress     String?                 @unique
+  approvalStatus    ApprovalStatus          @default(PENDING)
+  bio               String?
+  organization      String?
+  location          String?
+  participantMeta   String?
+  chainParticipantId Int?
+  isOnChainVerified Boolean                 @default(false)
+  walletLinkedAt    DateTime?
+  approvedAt        DateTime?
+  createdAt         DateTime                @default(now())
+  updatedAt         DateTime                @updatedAt
+  farms             Farm[]
+  createdBatches    Batch[]                 @relation("FarmerBatches")
+  transformations   Transformation[]
+  outgoingTransfers Transfer[]              @relation("OutgoingTransfers")
+  incomingTransfers Transfer[]              @relation("IncomingTransfers")
+  issuedCertificates Certificate[]          @relation("IssuedCertificates")
+  verifiedCertificates Certificate[]        @relation("VerifiedCertificates")
+  buyerOrders       BuyerOrder[]            @relation("BuyerOrders")
+  sellerOrders      BuyerOrder[]            @relation("SellerOrders")
+  buyerEscrows      EscrowRecord[]          @relation("BuyerEscrows")
+  sellerEscrows     EscrowRecord[]          @relation("SellerEscrows")
+  traceEvents       TraceEvent[]
+  blockchainTransactions BlockchainTransaction[]
+  documents         StoredDocument[]
+}
+
+model Farm {
+  id          String   @id @default(uuid())
+  chainFarmId Int?     @unique
+  ownerId     String
+  farmName    String
+  location    String
+  cropType    String
+  geoCoordinates String?
+  areaHectares Float?
+  metadataUri String?
+  txHash      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  batches     Batch[]
+
+  @@index([ownerId])
+}
+
+model Batch {
+  id           String      @id @default(uuid())
+  chainBatchId Int?        @unique
+  batchCode    String      @unique
+  farmId       String
+  farmerId     String
+  harvestDate  DateTime
+  quantity     Float
+  unit         String
+  metadataUri  String?
+  status       BatchStatus @default(CREATED)
+  txHash       String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  farm         Farm        @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  farmer       User        @relation("FarmerBatches", fields: [farmerId], references: [id], onDelete: Cascade)
+  transformations Transformation[]
+  transfers    Transfer[]
+  certificates Certificate[]
+  traceEvents  TraceEvent[]
+  orders       BuyerOrder[]
+  escrows      EscrowRecord[]
+  qrVerification QrVerification?
+
+  @@index([farmId])
+  @@index([farmerId])
+  @@index([status])
+}
+
+model Transformation {
+  id                 String   @id @default(uuid())
+  chainTransformationId Int?
+  batchId            String
+  actorId            String
+  transformationType String
+  details            String
+  metadataUri        String?
+  txHash             String?
+  createdAt          DateTime @default(now())
+  batch              Batch    @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  actor              User     @relation(fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@index([batchId])
+}
+
+model Transfer {
+  id              String   @id @default(uuid())
+  chainTransferId Int?
+  batchId         String
+  fromUserId      String
+  toUserId        String
+  details         String
+  txHash          String?
+  createdAt       DateTime @default(now())
+  batch           Batch    @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  fromUser        User     @relation("OutgoingTransfers", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUser          User     @relation("IncomingTransfers", fields: [toUserId], references: [id], onDelete: Cascade)
+
+  @@index([batchId])
+}
+
+model Certificate {
+  id                 String   @id @default(uuid())
+  chainCertificateId Int?
+  batchId            String
+  issuerId           String
+  verifierId         String?
+  certificateType    String
+  documentCid        String
+  metadataUri        String?
+  isVerified         Boolean  @default(false)
+  txHashCreate       String?
+  txHashVerify       String?
+  createdAt          DateTime @default(now())
+  verifiedAt         DateTime?
+  batch              Batch    @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  issuer             User     @relation("IssuedCertificates", fields: [issuerId], references: [id], onDelete: Cascade)
+  verifier           User?    @relation("VerifiedCertificates", fields: [verifierId], references: [id], onDelete: SetNull)
+
+  @@index([batchId])
+  @@index([isVerified])
+}
+
+model TraceEvent {
+  id          String   @id @default(uuid())
+  batchId     String
+  actorId     String?
+  eventType   String
+  details     String
+  metadataUri String?
+  txHash      String?
+  occurredAt  DateTime @default(now())
+  batch       Batch    @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  actor       User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([batchId])
+  @@index([eventType])
+}
+
+model BuyerOrder {
+  id             String      @id @default(uuid())
+  batchId         String
+  buyerId         String
+  sellerId        String
+  offeredAmount   Float
+  amountWei       String
+  currency        String      @default("ETH")
+  conditionNotes  String
+  status          OrderStatus @default(INITIATED)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  batch           Batch       @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  buyer           User        @relation("BuyerOrders", fields: [buyerId], references: [id], onDelete: Cascade)
+  seller          User        @relation("SellerOrders", fields: [sellerId], references: [id], onDelete: Cascade)
+  escrow          EscrowRecord?
+
+  @@index([batchId])
+  @@index([buyerId])
+}
+
+model EscrowRecord {
+  id                String       @id @default(uuid())
+  orderId           String       @unique
+  batchId           String
+  buyerId           String
+  sellerId          String
+  chainEscrowId     Int?         @unique
+  amount            Float
+  amountWei         String
+  conditionNotes    String
+  status            EscrowStatus @default(PENDING)
+  buyerConfirmedDelivery Boolean @default(false)
+  txHashCreate      String?
+  txHashRelease     String?
+  txHashRefund      String?
+  createdAt         DateTime     @default(now())
+  resolvedAt        DateTime?
+  order             BuyerOrder   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  batch             Batch        @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  buyer             User         @relation("BuyerEscrows", fields: [buyerId], references: [id], onDelete: Cascade)
+  seller            User         @relation("SellerEscrows", fields: [sellerId], references: [id], onDelete: Cascade)
+
+  @@index([batchId])
+}
+
+model BlockchainTransaction {
+  id           String            @id @default(uuid())
+  userId       String?
+  resourceType String
+  resourceId   String?
+  contractName String
+  methodName   String
+  txHash       String            @unique
+  chainId      Int
+  status       TransactionStatus @default(PENDING)
+  blockNumber  Int?
+  metadataJson Json?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  user         User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([resourceType, resourceId])
+}
+
+model QrVerification {
+  id             String   @id @default(uuid())
+  batchId         String   @unique
+  token           String   @unique
+  qrDataUrl       String?
+  verificationUrl String
+  createdAt       DateTime @default(now())
+  lastVerifiedAt  DateTime?
+  batch           Batch    @relation(fields: [batchId], references: [id], onDelete: Cascade)
+}
+
+model StoredDocument {
+  id           String   @id @default(uuid())
+  cid          String   @unique
+  originalName String
+  mimeType     String
+  byteSize     Int
+  relativePath String
+  uploadedById String?
+  createdAt    DateTime @default(now())
+  uploadedBy   User?    @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+}

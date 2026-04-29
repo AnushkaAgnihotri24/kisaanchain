@@ -1,0 +1,22 @@
+{
+  "name": "kisaanchain",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend",
+    "contracts"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm --prefix contracts run node\" \"npm --prefix backend run db:start\" \"npm --prefix backend run dev\" \"npm --prefix frontend run dev\"",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:contracts": "npm --prefix contracts run node",
+    "build": "npm --prefix contracts run compile && npm --prefix backend run build && npm --prefix frontend run build",
+    "lint": "npm --prefix backend run lint && npm --prefix frontend run lint",
+    "test": "npm --prefix contracts run test"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

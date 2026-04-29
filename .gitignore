@@ -1,0 +1,17 @@
+node_modules
+.next
+dist
+coverage
+artifacts
+cache
+typechain-types
+*.tsbuildinfo
+.env
+.env.local
+.env.*.local
+backend/prisma/dev.db
+backend/storage
+contracts/deployments/*.json
+frontend/.next
+frontend/out
+uploads

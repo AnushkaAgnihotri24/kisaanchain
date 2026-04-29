@@ -1,0 +1,9 @@
+{
+    "git.ignoreLimitWarning": true,
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "typescript.enablePromptUseWorkspaceTsdk": true,
+    "typescript.tsserver.maxTsServerMemory": 4096,
+    "solidity.compileUsingRemoteVersion": "v0.8.24+commit.e11b9ed9",
+    "solidity.packageDefaultDependenciesDirectory": "node_modules",
+    "solidity.packageDefaultDependenciesContractsDirectory": ""
+}
