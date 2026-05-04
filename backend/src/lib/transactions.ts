@@ -1,4 +1,5 @@
 import { Prisma, TransactionStatus } from "@prisma/client";
+import { blockchainConfig } from "../config/blockchain";
 import { prisma } from "./prisma";
 
 type RecordTransactionInput = {
@@ -31,7 +32,7 @@ export async function recordTransaction(input: RecordTransactionInput) {
       contractName: input.contractName,
       methodName: input.methodName,
       txHash: input.txHash,
-      chainId: input.chainId ?? 31337,
+      chainId: input.chainId ?? blockchainConfig.chainId,
       status: input.status ?? TransactionStatus.PENDING,
       metadataJson: input.metadataJson
     }

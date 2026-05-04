@@ -112,7 +112,7 @@ function VerifyContent() {
     <div className="page-stack">
       <PageHeader
         eyebrow="Consumer verification"
-        title="Verify saffron authenticity by QR token or batch code."
+        title="Verify crop authenticity by QR token or batch code."
         description="Consumers can scan a QR code or paste a batch identifier to inspect origin, certificates, processing history, transfers, and current authenticity status."
       />
 
@@ -161,7 +161,7 @@ function VerifyContent() {
         <Panel title="Verification guidance" subtitle="The product remains empty until real batches and QR tokens are created.">
           <div className="timeline">
             {[
-              "A farmer creates a real saffron batch after harvest.",
+              "A farmer creates a real crop batch after harvest.",
               "Certificates are uploaded and optionally verified by an authority.",
               "Transformations and transfers extend the chain of custody.",
               "A QR token is generated for the batch from the farmer dashboard.",
@@ -181,7 +181,7 @@ function VerifyContent() {
       {!result ? (
         <EmptyState
           title="No product verified yet"
-          description="Scan a QR code or paste a batch code to inspect an actual saffron batch once one has been recorded."
+          description="Scan a QR code or paste a batch code to inspect an actual crop batch once one has been recorded."
         />
       ) : (
         <>
@@ -205,7 +205,7 @@ function VerifyContent() {
           </Panel>
 
           <div className="panel-grid">
-            <Panel title="Batch and origin" subtitle="Core batch information visible to buyers and consumers.">
+            <Panel title="Batch and origin" subtitle="Core batch information visible to retailers and consumers.">
               <div className="detail-grid">
                 <KeyValue label="Batch code" value={result.batch.batchCode} />
                 <KeyValue label="Harvest date" value={formatDate(result.batch.harvestDate)} />

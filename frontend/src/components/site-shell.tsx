@@ -6,7 +6,7 @@ import { Menu, Wallet } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { connectWallet } from "@/lib/contracts";
-import { shortAddress } from "@/lib/format";
+import { roleLabel, shortAddress } from "@/lib/format";
 import { useAuth } from "@/contexts/auth-context";
 import { apiFetch } from "@/lib/api";
 
@@ -16,7 +16,7 @@ const navItems = [
   { href: "/verify", label: "Verify" },
   { href: "/dashboard/farmer", label: "Farmer" },
   { href: "/dashboard/admin", label: "Admin" },
-  { href: "/dashboard/buyer", label: "Buyer" }
+  { href: "/dashboard/buyer", label: "Retailer" }
 ];
 
 export function SiteShell({ children }: { children: React.ReactNode }) {
@@ -59,7 +59,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
             <span className="brand-mark__glyph">KC</span>
             <span>
               KisaanChain
-              <small>Saffron traceability on Ethereum</small>
+              <small>Crop traceability on Ethereum</small>
             </span>
           </Link>
 
@@ -80,10 +80,10 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
               <>
                 <button className="ghost-button" onClick={handleWalletLink} disabled={linkingWallet}>
                   <Wallet size={16} />
-                  {user.walletAddress ? shortAddress(user.walletAddress) : "Link wallet"}
+                  {user.walletAddress ? `Change wallet ${shortAddress(user.walletAddress)}` : "Connect MetaMask"}
                 </button>
                 <Link className="ghost-button" href="/settings">
-                  {user.role.toLowerCase()}
+                  {roleLabel(user.role)}
                 </Link>
                 <button className="primary-button" onClick={logout}>
                   Logout

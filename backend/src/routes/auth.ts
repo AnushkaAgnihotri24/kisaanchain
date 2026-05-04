@@ -6,6 +6,18 @@ import { prisma } from "../lib/prisma";
 import { requireAuth, AuthenticatedRequest } from "../middleware/auth";
 import { roleRequiresApproval } from "../lib/roles";
 
+function logAuthError(action: "register" | "login" | "link-wallet" | "profile", error: unknown) {
+  console.error(`Auth ${action} failed:`, error);
+}
+
+function getErrorMessage(error: unknown, fallback: string) {
+  if (error instanceof z.ZodError) {
+    return error.issues.map((issue) => issue.message).join(" ");
+  }
+
+  return fallback;
+}
+
 const registerSchema = z.object({
   name: z.string().min(2),
   email: z.string().email(),
@@ -78,7 +90,8 @@ authRouter.post("/register", async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(400).json({ message: "Unable to register account.", error });
+    logAuthError("register", error);
+    res.status(400).json({ message: getErrorMessage(error, "Unable to register account.") });
   }
 });
 
@@ -108,7 +121,8 @@ authRouter.post("/login", async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(400).json({ message: "Unable to log in.", error });
+    logAuthError("login", error);
+    res.status(400).json({ message: getErrorMessage(error, "Unable to log in.") });
   }
 });
 
@@ -136,6 +150,16 @@ authRouter.get("/me", requireAuth, async (req: AuthenticatedRequest, res) => {
 authRouter.post("/link-wallet", requireAuth, async (req: AuthenticatedRequest, res) => {
   try {
     const input = linkWalletSchema.parse(req.body);
+    const existingWalletUser = await prisma.user.findUnique({
+      where: { walletAddress: input.walletAddress },
+      select: { id: true, email: true }
+    });
+
+    if (existingWalletUser && existingWalletUser.id !== req.user!.id) {
+      return res.status(409).json({
+        message: "This MetaMask wallet is already linked to another KisaanChain account."
+      });
+    }
 
     const user = await prisma.user.update({
       where: { id: req.user!.id },
@@ -153,7 +177,8 @@ authRouter.post("/link-wallet", requireAuth, async (req: AuthenticatedRequest, r
       }
     });
   } catch (error) {
-    res.status(400).json({ message: "Unable to link wallet.", error });
+    logAuthError("link-wallet", error);
+    res.status(400).json({ message: getErrorMessage(error, "Unable to link wallet.") });
   }
 });
 
@@ -168,6 +193,7 @@ authRouter.patch("/profile", requireAuth, async (req: AuthenticatedRequest, res)
 
     res.json({ user });
   } catch (error) {
-    res.status(400).json({ message: "Unable to update profile.", error });
+    logAuthError("profile", error);
+    res.status(400).json({ message: getErrorMessage(error, "Unable to update profile.") });
   }
 });

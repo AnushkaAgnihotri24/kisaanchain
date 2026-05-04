@@ -97,7 +97,7 @@ describe("KisaanChain", function () {
     };
   }
 
-  it("supports the saffron lifecycle from participant approval to escrow release", async function () {
+  it("supports the crop lifecycle from participant approval to escrow release", async function () {
     const {
       admin,
       farmer,
@@ -134,7 +134,7 @@ describe("KisaanChain", function () {
 
     await farmRegistration
       .connect(farmer)
-      .registerFarm("Pampore Reserve", "Kashmir", "Saffron", "33.77,74.93", 12, "ipfs://farm");
+      .registerFarm("Pampore Reserve", "Kashmir", "Crop", "33.77,74.93", 12, "ipfs://farm");
 
     await batchCreation
       .connect(farmer)

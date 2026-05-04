@@ -7,7 +7,7 @@ import { EmptyState, PageHeader, Panel, StatCard } from "@/components/ui";
 import { useAuth } from "@/contexts/auth-context";
 import { apiFetch } from "@/lib/api";
 import { writeContract } from "@/lib/contracts";
-import { formatDate, shortAddress } from "@/lib/format";
+import { formatDate, roleLabel, shortAddress } from "@/lib/format";
 
 type Participant = {
   id: string;
@@ -45,7 +45,7 @@ type Transaction = {
 export default function AdminDashboardPage() {
   const { user, token } = useAuth();
   const [pendingParticipants, setPendingParticipants] = useState<Participant[]>([]);
-  const [buyers, setBuyers] = useState<Participant[]>([]);
+  const [retailers, setRetailers] = useState<Participant[]>([]);
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [working, setWorking] = useState<string | null>(null);
@@ -64,7 +64,7 @@ export default function AdminDashboardPage() {
       ]);
 
       setPendingParticipants(pendingPayload.participants);
-      setBuyers(participantsPayload.participants);
+      setRetailers(participantsPayload.participants);
       setCertificates(certificatesPayload.certificates);
       setTransactions(transactionsPayload.transactions);
     } catch (error) {
@@ -123,10 +123,10 @@ export default function AdminDashboardPage() {
     }
 
     const formData = new FormData(event.currentTarget);
-    const buyer = buyers.find((entry) => entry.id === String(formData.get("buyerId")));
+    const buyer = retailers.find((entry) => entry.id === String(formData.get("buyerId")));
 
     if (!buyer?.walletAddress) {
-      toast.error("Select a buyer with a linked wallet.");
+      toast.error("Select a retailer with a linked wallet.");
       return;
     }
 
@@ -149,7 +149,7 @@ export default function AdminDashboardPage() {
           method: "POST",
           body: JSON.stringify({
             userId: buyer.id,
-            resourceType: "buyer-rule",
+            resourceType: "retailer-rule",
             resourceId: buyer.id,
             contractName: "BuyerEnforcement",
             methodName: "setBuyerRule",
@@ -165,11 +165,11 @@ export default function AdminDashboardPage() {
         token
       );
 
-      toast.success("Buyer compliance rule recorded.");
+      toast.success("Retailer compliance rule recorded.");
       event.currentTarget.reset();
       await loadData();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Unable to apply buyer rule.");
+      toast.error(error instanceof Error ? error.message : "Unable to apply retailer rule.");
     } finally {
       setWorking(null);
     }
@@ -189,7 +189,7 @@ export default function AdminDashboardPage() {
 
       <section className="stats-grid">
         <StatCard label="Pending approvals" value={pendingParticipants.length} hint="Participants waiting for admin verification." />
-        <StatCard label="Approved buyers" value={buyers.length} hint="Buyers eligible for compliance rule configuration." />
+        <StatCard label="Approved retailers" value={retailers.length} hint="Retailers eligible for compliance rule configuration." />
         <StatCard label="Unverified certificates" value={certificates.length} hint="Certificates still awaiting review." />
         <StatCard label="Tracked transactions" value={transactions.length} hint="Backend transaction records across contracts." />
       </section>
@@ -205,7 +205,7 @@ export default function AdminDashboardPage() {
                   <div>
                     <strong>{participant.name}</strong>
                     <small>
-                      {participant.role} | {participant.email}
+                      {roleLabel(participant.role)} | {participant.email}
                     </small>
                   </div>
                   <div>{shortAddress(participant.walletAddress)}</div>
@@ -232,15 +232,15 @@ export default function AdminDashboardPage() {
           )}
         </Panel>
 
-        <Panel title="Buyer enforcement rules" subtitle="Apply on-chain compliance conditions before purchases can complete.">
+        <Panel title="Retailer enforcement rules" subtitle="Apply on-chain compliance conditions before purchases can complete.">
           <form className="form-grid" onSubmit={handleBuyerRule}>
             <div className="field">
-              <label>Buyer</label>
+              <label>Retailer</label>
               <select name="buyerId" required defaultValue="">
                 <option value="" disabled>
-                  Select approved buyer
+                  Select approved retailer
                 </option>
-                {buyers.map((buyer) => (
+                {retailers.map((buyer) => (
                   <option key={buyer.id} value={buyer.id}>
                     {buyer.name}
                   </option>
@@ -253,11 +253,11 @@ export default function AdminDashboardPage() {
             </div>
             <div className="field field--full">
               <label>Notes</label>
-              <textarea name="notes" placeholder="Compliance notes, buyer conditions, or settlement instructions." />
+              <textarea name="notes" placeholder="Compliance notes, retailer conditions, or settlement instructions." />
             </div>
             <div className="button-row">
               <button className="primary-button" type="submit" disabled={working === "buyer-rule"}>
-                {working === "buyer-rule" ? "Applying..." : "Apply buyer rule"}
+                {working === "buyer-rule" ? "Applying..." : "Apply retailer rule"}
               </button>
             </div>
           </form>

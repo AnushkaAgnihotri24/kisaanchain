@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { BatchStatus, EscrowStatus, OrderStatus, Prisma, Role, TransactionStatus } from "@prisma/client";
 import { z } from "zod";
+import { blockchainConfig } from "../config/blockchain";
 import { prisma } from "../lib/prisma";
 import { recordTransaction } from "../lib/transactions";
 import { requireApprovedParticipant, requireAuth, requireRoles, AuthenticatedRequest } from "../middleware/auth";
@@ -15,12 +16,12 @@ const createOrderSchema = z.object({
 const createEscrowSchema = z.object({
   chainEscrowId: z.number().int().positive().optional(),
   txHashCreate: z.string().optional(),
-  chainId: z.number().int().default(31337)
+  chainId: z.number().int().default(blockchainConfig.chainId)
 });
 
 const updateEscrowSchema = z.object({
   txHash: z.string().optional(),
-  chainId: z.number().int().default(31337)
+  chainId: z.number().int().default(blockchainConfig.chainId)
 });
 
 export const ordersRouter = Router();
@@ -109,7 +110,7 @@ ordersRouter.post(
 
       res.status(201).json({ order });
     } catch (error) {
-      res.status(400).json({ message: "Unable to create buyer order.", error });
+      res.status(400).json({ message: "Unable to create retailer order.", error });
     }
   }
 );
@@ -129,7 +130,7 @@ ordersRouter.post(
       }
 
       if (order.buyerId !== req.user!.id) {
-        return res.status(403).json({ message: "Only the buyer can fund escrow for this order." });
+        return res.status(403).json({ message: "Only the retailer can fund escrow for this order." });
       }
 
       const escrow = await prisma.escrowRecord.create({
@@ -221,7 +222,7 @@ ordersRouter.post(
       const escrow = await prisma.escrowRecord.findUnique({ where: { id: String(req.params.escrowId) } });
 
       if (!escrow || escrow.buyerId !== req.user!.id) {
-        return res.status(404).json({ message: "Escrow not found for this buyer." });
+        return res.status(404).json({ message: "Escrow not found for this retailer." });
       }
 
       const updatedEscrow = await prisma.escrowRecord.update({
@@ -278,7 +279,7 @@ ordersRouter.post(
       }
 
       if (req.user!.role !== Role.ADMIN && req.user!.id !== escrow.buyerId) {
-        return res.status(403).json({ message: "Only the buyer or an admin can release escrow." });
+        return res.status(403).json({ message: "Only the retailer or an admin can release escrow." });
       }
 
       const updatedEscrow = await prisma.escrowRecord.update({

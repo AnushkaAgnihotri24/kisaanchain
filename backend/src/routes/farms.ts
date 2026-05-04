@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { Prisma, Role, TransactionStatus } from "@prisma/client";
 import { z } from "zod";
+import { blockchainConfig } from "../config/blockchain";
 import { prisma } from "../lib/prisma";
 import { recordTransaction } from "../lib/transactions";
 import { requireApprovedParticipant, requireAuth, requireRoles, AuthenticatedRequest } from "../middleware/auth";
@@ -14,7 +15,7 @@ const createFarmSchema = z.object({
   metadataUri: z.string().optional(),
   chainFarmId: z.number().int().positive().optional(),
   txHash: z.string().optional(),
-  chainId: z.number().int().default(31337)
+  chainId: z.number().int().default(blockchainConfig.chainId)
 });
 
 export const farmsRouter = Router();

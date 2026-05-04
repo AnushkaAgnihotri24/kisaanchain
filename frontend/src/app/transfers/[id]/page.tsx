@@ -26,7 +26,7 @@ export default function TransferHistoryPage() {
       <PageHeader
         eyebrow="Ownership transfer"
         title={`${batch.batchCode} | chain of custody`}
-        description="Every recorded ownership transfer as the saffron batch moves through the supply chain."
+        description="Every recorded ownership transfer as the crop batch moves through the supply chain."
       />
       <Panel title="Transfer records" subtitle="Immutable ownership movement linked to the batch lifecycle.">
         {batch.transfers.length === 0 ? (

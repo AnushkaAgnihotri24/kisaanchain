@@ -1,6 +1,6 @@
 # KisaanChain
 
-KisaanChain is a full-stack Ethereum traceability platform for saffron supply chain management, built around the project report's layered architecture:
+KisaanChain is a full-stack Ethereum traceability platform for crop supply chain management, built around the project report's layered architecture:
 
 - User Layer
 - Application Layer
@@ -28,8 +28,8 @@ KisaanChain is a full-stack Ethereum traceability platform for saffron supply ch
 1. Copy `.env.example` to `.env` and update values.
 2. Start PostgreSQL with `docker compose up -d`.
 3. Install dependencies with `npm install` from the repo root.
-4. Start Hardhat node: `npm run dev:contracts`
-5. Deploy contracts: `npm --prefix contracts run deploy:local`
+4. Configure `SEPOLIA_RPC_URL` and `PRIVATE_KEY` in `.env`.
+5. Deploy contracts to Sepolia: `npm --prefix contracts run deploy:sepolia`
 6. Run Prisma migrate and seed admin: `npm --prefix backend run prisma:migrate`
 7. Start backend: `npm run dev:backend`
 8. Start frontend: `npm run dev:frontend`

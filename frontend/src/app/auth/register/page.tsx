@@ -54,7 +54,7 @@ export default function RegisterPage() {
             <label htmlFor="role">Role</label>
             <select id="role" name="role" defaultValue="FARMER">
               <option value="FARMER">Farmer</option>
-              <option value="BUYER">Buyer</option>
+              <option value="BUYER">Retailer</option>
               <option value="CONSUMER">Consumer</option>
               <option value="CERTIFIER">Certification authority</option>
             </select>

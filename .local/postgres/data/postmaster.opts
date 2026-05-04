@@ -1,1 +1,1 @@
-C:/Users/shubh/OneDrive/Desktop/kisaan_chain_re/backend/node_modules/@embedded-postgres/windows-x64/native/bin/postgres.exe "-D" "C:\Users\shubh\OneDrive\Desktop\kisaan_chain_re\.local\postgres\data" "-p" "5432"
+C:/Users/rajne/Desktop/2ndYear/Blockchain/4th sem/KisaanChain/kisaanchain/node_modules/@embedded-postgres/windows-x64/native/bin/postgres.exe "-D" "C:\Users\rajne\Desktop\2ndYear\Blockchain\4th sem\KisaanChain\kisaanchain\.local\postgres\data" "-p" "5432"

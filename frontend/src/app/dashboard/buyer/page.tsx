@@ -73,7 +73,7 @@ export default function BuyerDashboardPage() {
       setBatches(batchPayload.batches);
       setOrders(orderPayload.orders);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Unable to load buyer dashboard.");
+      toast.error(error instanceof Error ? error.message : "Unable to load retailer dashboard.");
     }
   }
 
@@ -105,7 +105,7 @@ export default function BuyerDashboardPage() {
         token
       );
 
-      toast.success("Buyer order created.");
+      toast.success("Retailer order created.");
       event.currentTarget.reset();
       await loadData();
     } catch (error) {
@@ -171,26 +171,26 @@ export default function BuyerDashboardPage() {
   });
 
   if (!user) {
-    return <EmptyState title="Sign in required" description="Log in as a buyer to browse batches and fund escrow." actionHref="/auth/login" actionLabel="Login" />;
+    return <EmptyState title="Sign in required" description="Log in as a retailer to browse batches and fund escrow." actionHref="/auth/login" actionLabel="Login" />;
   }
 
   return (
     <div className="page-stack">
       <PageHeader
-        eyebrow="Buyer dashboard"
-        title="Review verified saffron batches and move transactions into escrow."
+        eyebrow="Retailer dashboard"
+        title="Review verified crop batches and move transactions into escrow."
         description="Browse traceable batches, inspect their certification state, open purchase orders, and fund escrow when transaction conditions are ready."
       />
 
       <section className="stats-grid">
-        <StatCard label="Approval" value={user.approvalStatus} hint="Buyer approval and wallet access are required for escrow." />
+        <StatCard label="Approval" value={user.approvalStatus} hint="Retailer approval and wallet access are required for escrow." />
         <StatCard label="Available batches" value={batches.length} hint="Batches currently visible in the marketplace-style browse view." />
         <StatCard label="Orders" value={orders.length} hint="Purchase workflows initiated from your account." />
         <StatCard label="Escrow-ready" value={orders.filter((order) => !order.escrow).length} hint="Orders that can still be funded on-chain." />
       </section>
 
       <div className="dashboard-grid">
-        <Panel title="Search saffron batches" subtitle="Filter by batch code, farm name, or location before entering a purchase flow.">
+        <Panel title="Search crop batches" subtitle="Filter by batch code, farm name, or location before entering a purchase flow.">
           <div className="field field--full">
             <label htmlFor="batch-search">Search</label>
             <input
@@ -227,7 +227,7 @@ export default function BuyerDashboardPage() {
           </div>
         </Panel>
 
-        <Panel title="Initiate purchase workflow" subtitle="Create an off-chain buyer order before locking funds into the escrow contract.">
+        <Panel title="Initiate purchase workflow" subtitle="Create an off-chain retailer order before locking funds into the escrow contract.">
           <form className="form-grid" onSubmit={handleCreateOrder}>
             <div className="field">
               <label>Batch</label>
@@ -263,9 +263,9 @@ export default function BuyerDashboardPage() {
         </Panel>
       </div>
 
-      <Panel title="Your buyer orders" subtitle="Fund escrow for new orders, then continue settlement on the escrow detail page.">
+      <Panel title="Your retailer orders" subtitle="Fund escrow for new orders, then continue settlement on the escrow detail page.">
         {orders.length === 0 ? (
-          <EmptyState title="No orders yet" description="Create your first buyer order to start the settlement workflow." />
+          <EmptyState title="No orders yet" description="Create your first retailer order to start the settlement workflow." />
         ) : (
           <div className="list-card">
             {orders.map((order) => (

@@ -3,6 +3,14 @@ import fs from "node:fs";
 import path from "node:path";
 
 async function main() {
+  if (network.name !== "sepolia") {
+    throw new Error("KisaanChain deployment is configured for Sepolia. Run deploy:sepolia.");
+  }
+
+  if (!process.env.PRIVATE_KEY) {
+    throw new Error("PRIVATE_KEY is required to deploy KisaanChain contracts to Sepolia.");
+  }
+
   const [deployer] = await ethers.getSigners();
 
   const participantRegistryFactory = await ethers.getContractFactory("ParticipantRegistry");
@@ -102,7 +110,7 @@ async function main() {
 
   const deployment = {
     network: network.name,
-    chainId: Number(network.config.chainId ?? 31337),
+    chainId: Number(network.config.chainId ?? 11155111),
     deployedAt: new Date().toISOString(),
     deployer: deployer.address,
     contracts: {} as Record<string, { address: string; abi: unknown }>
@@ -131,8 +139,8 @@ async function main() {
 
   const targets = [
     path.resolve(__dirname, "..", "deployments", `${deployment.chainId}.json`),
-    path.resolve(__dirname, "..", "..", "frontend", "src", "lib", "contracts", "deployment.local.json"),
-    path.resolve(__dirname, "..", "..", "backend", "src", "generated", "deployment.local.json")
+    path.resolve(__dirname, "..", "..", "frontend", "src", "lib", "contracts", "deployment.sepolia.json"),
+    path.resolve(__dirname, "..", "..", "backend", "src", "generated", "deployment.sepolia.json")
   ];
 
   for (const target of targets) {

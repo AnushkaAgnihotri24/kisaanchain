@@ -93,7 +93,7 @@ export default function OnboardingPage() {
         <StatCard
           label="Approval"
           value={user.approvalStatus}
-          hint="Farmers, buyers, and certifiers need approval before protected actions."
+          hint="Farmers, retailers, and certifiers need approval before protected actions."
         />
         <StatCard
           label="Wallet"

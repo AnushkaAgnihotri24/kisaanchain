@@ -94,7 +94,7 @@ export default function BatchDetailPage() {
     <div className="page-stack">
       <PageHeader
         eyebrow="Batch detail"
-        title={`${record.batchCode} | full saffron lifecycle`}
+        title={`${record.batchCode} | full crop lifecycle`}
         description="This view combines farm origin, certifications, transformations, transfers, escrow-linked orders, and QR verification state."
       />
 
@@ -161,7 +161,7 @@ export default function BatchDetailPage() {
             </div>
             <div className="field field--full">
               <label>Transfer details</label>
-              <textarea name="details" required placeholder="Transferred to buyer after escrow funding and packaging validation." />
+              <textarea name="details" required placeholder="Transferred to retailer after escrow funding and packaging validation." />
             </div>
             <div className="button-row">
               <button className="primary-button" type="submit" disabled={working}>

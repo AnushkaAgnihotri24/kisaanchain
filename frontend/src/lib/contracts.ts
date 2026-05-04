@@ -1,15 +1,28 @@
 "use client";
 
 import { BrowserProvider, Contract, parseEther } from "ethers";
-import deployment from "./contracts/deployment.local.json";
+import {
+  contractDeployment,
+  SEPOLIA_CHAIN_ID,
+  SEPOLIA_CHAIN_ID_HEX,
+  sepoliaNetworkParams
+} from "./contracts/config";
 
 declare global {
   interface Window {
-    ethereum?: {
-      request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
-    };
+    ethereum?: EthereumProvider;
   }
 }
+
+type EthereumProvider = {
+      request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
+      isMetaMask?: boolean;
+      providers?: EthereumProvider[];
+};
+
+type WalletRpcError = Error & {
+  code?: number;
+};
 
 export const roleToContractEnum = {
   FARMER: 1,
@@ -19,13 +32,48 @@ export const roleToContractEnum = {
   CERTIFIER: 5
 } as const;
 
-export async function connectWallet() {
+function getMetaMaskProvider() {
   if (!window.ethereum) {
-    throw new Error("MetaMask or a compatible wallet is required.");
+    return null;
   }
 
-  await window.ethereum.request({ method: "eth_requestAccounts" });
-  const provider = new BrowserProvider(window.ethereum);
+  if (window.ethereum.providers?.length) {
+    return window.ethereum.providers.find((provider) => provider.isMetaMask) || null;
+  }
+
+  return window.ethereum.isMetaMask ? window.ethereum : null;
+}
+
+export async function connectWallet() {
+  const ethereum = getMetaMaskProvider();
+
+  if (!ethereum) {
+    throw new Error("MetaMask is required. Install MetaMask or enable the MetaMask browser extension.");
+  }
+
+  try {
+    try {
+      await ethereum.request({
+        method: "wallet_requestPermissions",
+        params: [{ eth_accounts: {} }]
+      });
+    } catch (error) {
+      if ((error as WalletRpcError).code !== -32601) {
+        throw error;
+      }
+    }
+
+    await ethereum.request({ method: "eth_requestAccounts" });
+  } catch (error) {
+    if ((error as WalletRpcError).code === 4001) {
+      throw new Error("Wallet connection was rejected.");
+    }
+
+    throw new Error(error instanceof Error ? error.message : "Unable to connect wallet.");
+  }
+
+  await ensureSepoliaNetwork(ethereum);
+  const provider = new BrowserProvider(ethereum as any);
   const signer = await provider.getSigner();
   return {
     provider,
@@ -35,17 +83,51 @@ export async function connectWallet() {
   };
 }
 
+async function ensureSepoliaNetwork(ethereum: EthereumProvider) {
+  const currentChainId = await ethereum.request({ method: "eth_chainId" });
+  if (String(currentChainId).toLowerCase() === SEPOLIA_CHAIN_ID_HEX) {
+    return;
+  }
+
+  try {
+    await ethereum.request({
+      method: "wallet_switchEthereumChain",
+      params: [{ chainId: SEPOLIA_CHAIN_ID_HEX }]
+    });
+  } catch (error) {
+    const rpcError = error as WalletRpcError;
+
+    if (rpcError.code === 4902) {
+      await ethereum.request({
+        method: "wallet_addEthereumChain",
+        params: [sepoliaNetworkParams]
+      });
+      return;
+    }
+
+    if (rpcError.code === 4001) {
+      throw new Error("Please switch MetaMask to Sepolia to continue.");
+    }
+
+    throw new Error(error instanceof Error ? error.message : "Unable to switch MetaMask to Sepolia.");
+  }
+}
+
 export function getDeployment() {
-  return deployment;
+  return contractDeployment;
 }
 
 export async function getContract(name: string) {
   const wallet = await connectWallet();
-  const contracts = deployment.contracts as Record<string, { address: string; abi: unknown }>;
+  const contracts = contractDeployment.contracts as Record<string, { address: string; abi: unknown }>;
   const contract = contracts[name];
 
   if (!contract?.address) {
-    throw new Error(`${name} is not deployed yet. Run the Hardhat deploy script first.`);
+    throw new Error(`${name} is not deployed on Sepolia yet. Deploy the contracts and update the Sepolia deployment config.`);
+  }
+
+  if (wallet.chainId !== SEPOLIA_CHAIN_ID) {
+    throw new Error("MetaMask must be connected to Sepolia.");
   }
 
   return {

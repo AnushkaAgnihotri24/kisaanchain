@@ -2,6 +2,7 @@ import { Router } from "express";
 import { ApprovalStatus, BatchStatus, Prisma, Role, TransactionStatus } from "@prisma/client";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
+import { blockchainConfig } from "../config/blockchain";
 import { env } from "../config/env";
 import { prisma } from "../lib/prisma";
 import { generateQrDataUrl } from "../lib/qr";
@@ -17,13 +18,13 @@ const createBatchSchema = z.object({
   metadataUri: z.string().optional(),
   chainBatchId: z.number().int().positive().optional(),
   txHash: z.string().optional(),
-  chainId: z.number().int().default(31337)
+  chainId: z.number().int().default(blockchainConfig.chainId)
 });
 
 const updateStatusSchema = z.object({
   status: z.nativeEnum(BatchStatus),
   txHash: z.string().optional(),
-  chainId: z.number().int().default(31337)
+  chainId: z.number().int().default(blockchainConfig.chainId)
 });
 
 const transformationSchema = z.object({
@@ -32,7 +33,7 @@ const transformationSchema = z.object({
   metadataUri: z.string().optional(),
   chainTransformationId: z.number().int().positive().optional(),
   txHash: z.string().optional(),
-  chainId: z.number().int().default(31337)
+  chainId: z.number().int().default(blockchainConfig.chainId)
 });
 
 const certificateSchema = z.object({
@@ -41,12 +42,12 @@ const certificateSchema = z.object({
   metadataUri: z.string().optional(),
   chainCertificateId: z.number().int().positive().optional(),
   txHashCreate: z.string().optional(),
-  chainId: z.number().int().default(31337)
+  chainId: z.number().int().default(blockchainConfig.chainId)
 });
 
 const verifyCertificateSchema = z.object({
   txHashVerify: z.string().optional(),
-  chainId: z.number().int().default(31337)
+  chainId: z.number().int().default(blockchainConfig.chainId)
 });
 
 const transferSchema = z.object({
@@ -54,7 +55,7 @@ const transferSchema = z.object({
   details: z.string().min(2),
   chainTransferId: z.number().int().positive().optional(),
   txHash: z.string().optional(),
-  chainId: z.number().int().default(31337)
+  chainId: z.number().int().default(blockchainConfig.chainId)
 });
 
 const traceEventSchema = z.object({
@@ -62,7 +63,7 @@ const traceEventSchema = z.object({
   details: z.string().min(2),
   metadataUri: z.string().optional(),
   txHash: z.string().optional(),
-  chainId: z.number().int().default(31337)
+  chainId: z.number().int().default(blockchainConfig.chainId)
 });
 
 export const batchesRouter = Router();

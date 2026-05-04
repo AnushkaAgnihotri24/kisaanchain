@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { ApprovalStatus, Prisma, Role, TransactionStatus } from "@prisma/client";
 import { z } from "zod";
+import { blockchainConfig } from "../config/blockchain";
 import { prisma } from "../lib/prisma";
 import { recordTransaction } from "../lib/transactions";
 import { requireApprovedParticipant, requireAuth, requireRoles, AuthenticatedRequest } from "../middleware/auth";
@@ -9,7 +10,7 @@ const requestSchema = z.object({
   participantMeta: z.string().min(1),
   chainParticipantId: z.number().int().positive().optional(),
   txHash: z.string().min(1).optional(),
-  chainId: z.number().int().default(31337)
+  chainId: z.number().int().default(blockchainConfig.chainId)
 });
 
 const approveSchema = z.object({
@@ -17,7 +18,7 @@ const approveSchema = z.object({
   notes: z.string().optional(),
   chainParticipantId: z.number().int().positive().optional(),
   txHash: z.string().min(1).optional(),
-  chainId: z.number().int().default(31337)
+  chainId: z.number().int().default(blockchainConfig.chainId)
 });
 
 export const participantsRouter = Router();

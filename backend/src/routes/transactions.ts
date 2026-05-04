@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { Prisma, Role, TransactionStatus } from "@prisma/client";
 import { z } from "zod";
+import { blockchainConfig } from "../config/blockchain";
 import { prisma } from "../lib/prisma";
 import { requireAuth, requireRoles, AuthenticatedRequest } from "../middleware/auth";
 import { recordTransaction } from "../lib/transactions";
@@ -17,7 +18,7 @@ const createTransactionSchema = z.object({
   contractName: z.string().min(1),
   methodName: z.string().min(1),
   txHash: z.string().min(1),
-  chainId: z.number().int().default(31337),
+  chainId: z.number().int().default(blockchainConfig.chainId),
   status: z.nativeEnum(TransactionStatus).default(TransactionStatus.PENDING),
   metadataJson: z.record(z.any()).optional()
 });

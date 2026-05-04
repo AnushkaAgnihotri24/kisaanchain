@@ -32,7 +32,8 @@ const envSchema = z.object({
   NEXT_PUBLIC_APP_URL: z.string().url(),
   CONSUMER_APP_ORIGIN: z.string().url().default("http://localhost:3000"),
   LOCAL_IPFS_DIR: z.string().default("backend/storage/ipfs"),
-  UPLOADS_DIR: z.string().default("backend/storage/uploads")
+  UPLOADS_DIR: z.string().default("backend/storage/uploads"),
+  SEPOLIA_RPC_URL: z.preprocess((value) => (value === "" ? undefined : value), z.string().url().optional())
 });
 
 const parsedEnv = envSchema.parse(process.env);
@@ -45,6 +46,8 @@ const repoRoot =
 const databaseUrl =
   parsedEnv.DATABASE_URL ||
   `postgresql://${encodeURIComponent(parsedEnv.POSTGRES_USER)}:${encodeURIComponent(parsedEnv.POSTGRES_PASSWORD)}@${parsedEnv.POSTGRES_HOST}:${parsedEnv.POSTGRES_PORT}/${parsedEnv.POSTGRES_DB}`;
+
+process.env.DATABASE_URL = databaseUrl;
 
 export const env = {
   ...parsedEnv,

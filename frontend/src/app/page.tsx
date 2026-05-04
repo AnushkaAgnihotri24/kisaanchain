@@ -4,12 +4,12 @@ import { PageHeader, Panel, StatCard } from "@/components/ui";
 
 const modules = [
   "Participant registry and admin verification",
-  "Farm origin registration for verified saffron farms",
+  "Farm origin registration for verified crop farms",
   "Harvest batch creation with immutable blockchain identity",
   "Batch transformation history for grading, drying, cleaning, and packaging",
   "Ownership transfer records across the supply chain",
   "Certificate upload, verification, and IPFS-linked proofs",
-  "Buyer compliance checks and escrow-backed settlement",
+  "Retailer compliance checks and escrow-backed settlement",
   "Consumer QR verification with chain-of-custody visibility"
 ];
 
@@ -18,8 +18,8 @@ export default function HomePage() {
     <div className="page-stack">
       <section className="hero">
         <div className="hero-card">
-          <span className="eyebrow">Blockchain saffron traceability</span>
-          <h1>Premium trust for every saffron batch, from farm to final scan.</h1>
+          <span className="eyebrow">Blockchain crop traceability</span>
+          <h1>Premium trust for every crop batch, from farm to final scan.</h1>
           <p>
             KisaanChain records farm origin, harvest batches, certificates, transformations, ownership transfers,
             escrow-backed payments, and consumer verification on a layered Ethereum supply chain platform.
@@ -53,14 +53,14 @@ export default function HomePage() {
           <article className="spotlight-card">
             <BadgeCheck size={22} />
             <strong>Escrow-backed fairness</strong>
-            <p>Buyer compliance and conditional payment release make settlement clearer for farmers and buyers.</p>
+            <p>Retailer compliance and conditional payment release make settlement clearer for farmers and retailers.</p>
           </article>
         </div>
       </section>
 
       <section className="stats-grid">
         <StatCard label="Smart contracts" value="10" hint="Modular Solidity contracts aligned with the report." />
-        <StatCard label="Core roles" value="5" hint="Farmer, admin, buyer, consumer, and certifier." />
+        <StatCard label="Core roles" value="5" hint="Farmer, admin, retailer, consumer, and certifier." />
         <StatCard label="Architecture layers" value="5" hint="User to supply chain, with clean separation." />
         <StatCard label="Initial mock records" value="0" hint="Every record comes from real user input flows." />
       </section>
@@ -88,11 +88,11 @@ export default function HomePage() {
         <Panel title="Layered product journey" subtitle="Built around the report's five-layer architecture.">
           <div className="timeline">
             {[
-              "User Layer: farmers, admins, buyers, consumers, certifiers",
+              "User Layer: farmers, admins, retailers, consumers, certifiers",
               "Application Layer: Next.js dashboards, verification pages, MetaMask flows",
               "Backend Layer: JWT auth, PostgreSQL, document storage, search, orchestration",
               "Blockchain Layer: Ethereum smart contracts through Hardhat and Ethers.js",
-              "Supply Chain Layer: saffron lifecycle from origin to verified consumer scan"
+              "Supply Chain Layer: crop lifecycle from origin to verified consumer scan"
             ].map((step) => (
               <article className="timeline-item" key={step}>
                 <span className="timeline-item__dot" />
@@ -114,7 +114,7 @@ export default function HomePage() {
             Admin dashboard
           </Link>
           <Link href="/dashboard/buyer" className="ghost-button">
-            Buyer dashboard
+            Retailer dashboard
           </Link>
           <Link href="/verify" className="primary-button">
             Consumer verification <ArrowRight size={16} />

@@ -62,7 +62,7 @@ export default function EscrowDetailPage() {
   }
 
   if (!escrow) {
-    return <EmptyState title="Loading escrow" description="Fetching payment, buyer, seller, and resolution details." />;
+    return <EmptyState title="Loading escrow" description="Fetching payment, retailer, seller, and resolution details." />;
   }
 
   return (
@@ -70,17 +70,17 @@ export default function EscrowDetailPage() {
       <PageHeader
         eyebrow="Escrow and settlement"
         title={`${escrow.order.batchCode ?? escrow.batch.batchCode} | payment flow`}
-        description="Buyer-funded escrow stays locked until delivery and ownership conditions are fulfilled."
+        description="Retailer-funded escrow stays locked until delivery and ownership conditions are fulfilled."
       />
 
       <Panel title="Escrow overview" subtitle="Settlement data from the off-chain order and on-chain escrow record.">
         <div className="detail-grid">
           <KeyValue label="Status" value={toTitleCase(escrow.status)} />
-          <KeyValue label="Buyer" value={escrow.buyer.name} />
+          <KeyValue label="Retailer" value={escrow.buyer.name} />
           <KeyValue label="Seller" value={escrow.seller.name} />
           <KeyValue label="Amount" value={`${escrow.amount} ETH`} />
           <KeyValue label="Created" value={formatDate(escrow.createdAt)} />
-          <KeyValue label="Buyer confirmed" value={escrow.buyerConfirmedDelivery ? "Yes" : "No"} />
+          <KeyValue label="Retailer confirmed" value={escrow.buyerConfirmedDelivery ? "Yes" : "No"} />
         </div>
       </Panel>
 

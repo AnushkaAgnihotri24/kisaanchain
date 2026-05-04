@@ -73,7 +73,7 @@ contract PaymentEscrow is AccessControl, ReentrancyGuard {
         address seller,
         string calldata conditionNotes
     ) external payable nonReentrant returns (uint256 escrowId) {
-        require(participantRegistry.isVerifiedRole(msg.sender, BUYER_ROLE), "Only verified buyers");
+        require(participantRegistry.isVerifiedRole(msg.sender, BUYER_ROLE), "Only verified retailers");
         require(batchCreation.batchExists(batchId), "Batch does not exist");
         require(buyerEnforcement.canPurchase(msg.sender), "Buyer rule check failed");
         require(ownershipTransfer.ownerOfBatch(batchId) == seller, "Seller must own batch");
@@ -111,7 +111,7 @@ contract PaymentEscrow is AccessControl, ReentrancyGuard {
 
     function confirmDelivery(uint256 escrowId) external {
         EscrowRecord storage escrow = _escrows[escrowId];
-        require(escrow.buyer == msg.sender, "Only buyer can confirm delivery");
+        require(escrow.buyer == msg.sender, "Only retailer can confirm delivery");
         require(escrow.status == EscrowStatus.PENDING, "Escrow is not pending");
 
         escrow.buyerConfirmedDelivery = true;
@@ -130,14 +130,14 @@ contract PaymentEscrow is AccessControl, ReentrancyGuard {
     function releaseEscrow(uint256 escrowId) external nonReentrant {
         EscrowRecord storage escrow = _escrows[escrowId];
         require(escrow.status == EscrowStatus.PENDING, "Escrow is not pending");
-        require(escrow.buyerConfirmedDelivery, "Buyer has not confirmed delivery");
+        require(escrow.buyerConfirmedDelivery, "Retailer has not confirmed delivery");
         require(
             ownershipTransfer.ownerOfBatch(escrow.batchId) == escrow.buyer,
             "Ownership must be transferred to buyer"
         );
         require(
             msg.sender == escrow.buyer || hasRole(DEFAULT_ADMIN_ROLE, msg.sender),
-            "Only buyer or admin"
+            "Only retailer or admin"
         );
 
         escrow.status = EscrowStatus.RELEASED;

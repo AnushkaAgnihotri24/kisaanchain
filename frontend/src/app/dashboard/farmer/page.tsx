@@ -356,7 +356,7 @@ export default function FarmerDashboardPage() {
     <div className="page-stack">
       <PageHeader
         eyebrow="Farmer dashboard"
-        title="Register origin, create saffron batches, and manage on-chain lifecycle records."
+        title="Register origin, create crop batches, and manage on-chain lifecycle records."
         description="This workspace follows the farmer journey in the report: verified farm origin, harvest batch creation, traceability updates, certificates, and QR generation."
       />
 
@@ -368,11 +368,11 @@ export default function FarmerDashboardPage() {
       </section>
 
       <div className="dashboard-grid">
-        <Panel title="Register farm" subtitle="Create a trusted saffron origin record through the Farm Registration contract.">
+        <Panel title="Register farm" subtitle="Create a trusted crop origin record through the Farm Registration contract.">
           <form className="form-grid" onSubmit={handleFarmCreate}>
             <div className="field">
               <label>Farm name</label>
-              <input name="farmName" required placeholder="Pampore Saffron Estate" />
+              <input name="farmName" required placeholder="Green Valley Crop Estate" />
             </div>
             <div className="field">
               <label>Location</label>
@@ -380,7 +380,7 @@ export default function FarmerDashboardPage() {
             </div>
             <div className="field">
               <label>Crop type</label>
-              <input name="cropType" defaultValue="Saffron" required />
+              <input name="cropType" defaultValue="Crop" required />
             </div>
             <div className="field">
               <label>Area in hectares</label>
@@ -560,7 +560,7 @@ export default function FarmerDashboardPage() {
         ) : farms.length === 0 ? (
           <EmptyState
             title="No farms yet"
-            description="Register your first saffron farm to establish trusted origin before creating any batches."
+            description="Register your first crop farm to establish trusted origin before creating any batches."
           />
         ) : (
           <div className="list-card">
@@ -589,7 +589,7 @@ export default function FarmerDashboardPage() {
         ) : batches.length === 0 ? (
           <EmptyState
             title="No batches yet"
-            description="After farm registration, create a harvested saffron batch and it will appear here."
+            description="After farm registration, create a harvested crop batch and it will appear here."
           />
         ) : (
           <div className="list-card">

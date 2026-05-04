@@ -1,0 +1,63 @@
+
+> kisaanchain@1.0.0 dev
+> concurrently "npm --prefix backend run db:start" "npm --prefix backend run dev" "npm --prefix frontend run dev"
+
+[0] 
+[0] > kisaanchain-backend@1.0.0 db:start
+[0] > node scripts/start-local-postgres.mjs
+[0] 
+[1] 
+[1] > kisaanchain-backend@1.0.0 dev
+[1] > tsx watch src/server.ts
+[1] 
+[2] 
+[2] > kisaanchain-frontend@1.0.0 dev
+[2] > next dev -p 3000
+[2] 
+[0] Embedded PostgreSQL already running on postgresql://127.0.0.1:5432/kisaanchain
+[0] npm --prefix backend run db:start exited with code 0
+[2]    ▲ Next.js 15.5.15
+[2]    - Local:        http://localhost:3000
+[2]    - Network:      http://172.31.144.1:3000
+[2] 
+[2]  ✓ Starting...
+[2]  ✓ Ready in 5s
+[1] KisaanChain backend listening on http://localhost:4000
+[2]  ○ Compiling / ...
+[2]  ✓ Compiled / in 3.6s (1043 modules)
+[2]  GET / 200 in 5053ms
+[1] [0mGET /api/health [32m200[0m 99.782 ms - 58999[0m
+[2]  GET / 200 in 252ms
+[2]  ○ Compiling /auth/register ...
+[2]  ✓ Compiled /auth/register in 1183ms (1052 modules)
+[2]  GET /auth/register 200 in 1911ms
+[2]  ✓ Compiled in 797ms (1052 modules)
+[2]  ✓ Compiled in 479ms (1052 modules)
+[2]  GET / 200 in 409ms
+[2]  ○ Compiling /dashboard/buyer ...
+[2]  ✓ Compiled /dashboard/buyer in 648ms (1054 modules)
+[2]  GET /dashboard/buyer 200 in 1004ms
+[1] [0mGET /api/health [32m200[0m 83.524 ms - 58999[0m
+[2]  ○ Compiling /dashboard/admin ...
+[2]  ✓ Compiled /dashboard/admin in 1197ms (1040 modules)
+[2]  GET /dashboard/admin 200 in 2497ms
+[1] [0mGET /api/participants/pending [33m403[0m 202.762 ms - 52[0m
+[1] [0mGET /api/participants?role=BUYER&approvalStatus=APPROVED [32m200[0m 210.252 ms - 19[0m
+[1] [0mGET /api/batches/certificates?status=unverified [32m200[0m 215.437 ms - 19[0m
+[1] [0mGET /api/transactions [32m200[0m 229.691 ms - 19[0m
+[2]  ○ Compiling /settings ...
+[2]  ✓ Compiled /settings in 849ms (1047 modules)
+[2]  GET /settings 200 in 1834ms
+[2]  ○ Compiling /dashboard/farmer ...
+[2]  ✓ Compiled /dashboard/farmer in 1266ms (1054 modules)
+[2]  ✓ Compiled /dashboard/buyer in 460ms (618 modules)
+[2]  GET /dashboard/farmer 200 in 2804ms
+[2]  GET /dashboard/buyer 200 in 1643ms
+[2]  ○ Compiling /verify ...
+[2]  ✓ Compiled /verify in 2.2s (1118 modules)
+[2]  GET /verify 200 in 2728ms
+[1] [0mGET /api/batches [32m200[0m 10.194 ms - 14[0m
+[1] [0mGET /api/farms?ownerId=5be77799-8b51-4a0e-9b00-5374ccfd2c0d [32m200[0m 16.472 ms - 12[0m
+[1] [0mGET /api/batches [32m200[0m 4.536 ms - 14[0m
+[1] [0mGET /api/orders [32m200[0m 12.690 ms - 13[0m
+[2]  GET /settings 200 in 223ms

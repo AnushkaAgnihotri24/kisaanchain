@@ -12,13 +12,14 @@ import { verifyRouter } from "./routes/verify";
 import { uploadsRouter } from "./routes/uploads";
 import { transactionsRouter } from "./routes/transactions";
 import { blockchainDeployment } from "./lib/blockchain";
+import { blockchainConfig } from "./config/blockchain";
 import { verifyPostgresConnection } from "./lib/postgres";
 
 export const app = express();
 
 app.use(
   cors({
-    origin: [env.CONSUMER_APP_ORIGIN, env.NEXT_PUBLIC_APP_URL],
+    origin: [env.CONSUMER_APP_ORIGIN, env.NEXT_PUBLIC_APP_URL, "http://localhost:3000"],
     credentials: true
   })
 );
@@ -37,6 +38,11 @@ app.get("/api/health", async (_req, res) => {
         name: dbResult.rows[0]?.current_database,
         user: dbResult.rows[0]?.current_user
       },
+      blockchain: {
+        network: blockchainConfig.networkName,
+        chainId: blockchainConfig.chainId,
+        rpcConfigured: Boolean(env.SEPOLIA_RPC_URL)
+      },
       deployment: blockchainDeployment
     });
   } catch (error) {
@@ -46,6 +52,11 @@ app.get("/api/health", async (_req, res) => {
         connected: false
       },
       message: error instanceof Error ? error.message : "Database unavailable.",
+      blockchain: {
+        network: blockchainConfig.networkName,
+        chainId: blockchainConfig.chainId,
+        rpcConfigured: Boolean(env.SEPOLIA_RPC_URL)
+      },
       deployment: blockchainDeployment
     });
   }
@@ -61,6 +72,7 @@ app.use("/api/upload", uploadsRouter);
 app.use("/api/transactions", transactionsRouter);
 
 app.use((error: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  console.error("Unhandled backend error:", error);
   res.status(500).json({
     message: error.message || "Unexpected server error."
   });

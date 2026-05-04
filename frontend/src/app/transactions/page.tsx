@@ -26,7 +26,7 @@ export default function TransactionsPage() {
       <PageHeader
         eyebrow="Blockchain transactions"
         title="Tracked contract activity across KisaanChain."
-        description="The backend records transaction references for participant approvals, farm registration, batches, certificates, transfers, traceability, buyer enforcement, and escrow."
+        description="The backend records transaction references for participant approvals, farm registration, batches, certificates, transfers, traceability, retailer enforcement, and escrow."
       />
       <Panel title="Transaction ledger" subtitle="Recent blockchain interactions recorded by the backend.">
         {transactions.length === 0 ? (

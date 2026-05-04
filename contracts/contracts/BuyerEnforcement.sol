@@ -43,7 +43,7 @@ contract BuyerEnforcement is AccessControl {
         uint256 maxActiveEscrows,
         string calldata notes
     ) external onlyRole(DEFAULT_ADMIN_ROLE) {
-        require(participantRegistry.isVerifiedRole(buyer, BUYER_ROLE), "Buyer must be verified");
+        require(participantRegistry.isVerifiedRole(buyer, BUYER_ROLE), "Retailer must be verified");
 
         _buyerRules[buyer] = BuyerRule({
             complianceApproved: complianceApproved,

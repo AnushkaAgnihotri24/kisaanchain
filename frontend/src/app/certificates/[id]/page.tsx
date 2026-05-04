@@ -98,7 +98,7 @@ export default function CertificateDetailPage() {
           </div>
         ) : null}
       </Panel>
-      <Panel title="Linked batch" subtitle="The certificate is attached to a specific saffron batch and origin farm.">
+      <Panel title="Linked batch" subtitle="The certificate is attached to a specific crop batch and origin farm.">
         <div className="detail-grid">
           <KeyValue label="Batch code" value={certificate.batch.batchCode} />
           <KeyValue label="Farm" value={certificate.batch.farm.farmName} />

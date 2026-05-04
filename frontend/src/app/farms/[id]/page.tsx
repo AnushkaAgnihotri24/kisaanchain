@@ -27,7 +27,7 @@ export default function FarmDetailPage() {
       <PageHeader
         eyebrow="Farm detail"
         title={farm.farmName}
-        description="Trusted origin record for saffron production, including location, crop type, owner, and linked batches."
+        description="Trusted origin record for crop production, including location, crop type, owner, and linked batches."
       />
       <Panel title="Origin profile" subtitle="Farm metadata captured during registration.">
         <div className="detail-grid">
@@ -39,9 +39,9 @@ export default function FarmDetailPage() {
           <KeyValue label="Created" value={formatDate(farm.createdAt)} />
         </div>
       </Panel>
-      <Panel title="Linked batches" subtitle="Harvested saffron batches originating from this farm.">
+      <Panel title="Linked batches" subtitle="Harvested crop batches originating from this farm.">
         {farm.batches.length === 0 ? (
-          <EmptyState title="No farm batches yet" description="Create the first harvested saffron batch to build this farm's history." />
+          <EmptyState title="No farm batches yet" description="Create the first harvested crop batch to build this farm's history." />
         ) : (
           <div className="list-card">
             {farm.batches.map((batch: any) => (

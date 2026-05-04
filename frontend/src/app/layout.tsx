@@ -16,7 +16,7 @@ const displayFont = Fraunces({
 
 export const metadata: Metadata = {
   title: "KisaanChain",
-  description: "Blockchain-based saffron supply chain traceability from farm to consumer."
+  description: "Blockchain-based crop supply chain traceability from farm to consumer."
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

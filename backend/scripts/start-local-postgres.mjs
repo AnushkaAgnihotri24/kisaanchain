@@ -37,25 +37,74 @@ const cluster = new EmbeddedPostgres({
   onError: (message) => console.error(`[embedded-postgres] ${String(message)}`)
 });
 
+async function waitForPostgres(retries = 20) {
+  let lastError;
+
+  for (let attempt = 1; attempt <= retries; attempt += 1) {
+    const pool = new pg.Pool({
+      connectionString: `postgresql://${encodeURIComponent(user)}:${encodeURIComponent(password)}@${host}:${port}/postgres`,
+      max: 1,
+      connectionTimeoutMillis: 1000
+    });
+
+    try {
+      await pool.query("select 1");
+      return true;
+    } catch (error) {
+      lastError = error;
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    } finally {
+      await pool.end().catch(() => {});
+    }
+  }
+
+  if (lastError) {
+    throw lastError;
+  }
+
+  return false;
+}
+
+async function ensureDatabase() {
+  const pool = new pg.Pool({
+    connectionString: `postgresql://${encodeURIComponent(user)}:${encodeURIComponent(password)}@${host}:${port}/postgres`,
+    max: 1
+  });
+
+  try {
+    const exists = await pool.query("select exists(select 1 from pg_database where datname = $1) as exists", [database]);
+    if (!exists.rows[0]?.exists) {
+      await pool.query(`create database "${database}"`);
+    }
+  } finally {
+    await pool.end();
+  }
+}
+
 if (!fs.existsSync(path.join(dataDir, "PG_VERSION"))) {
   await cluster.initialise();
 }
 
-await cluster.start();
-
-const pool = new pg.Pool({
-  connectionString: `postgresql://${encodeURIComponent(user)}:${encodeURIComponent(password)}@${host}:${port}/postgres`,
-  max: 1
-});
+if (await waitForPostgres(1).catch(() => false)) {
+  await ensureDatabase();
+  console.log(`Embedded PostgreSQL already running on postgresql://${host}:${port}/${database}`);
+  process.exit(0);
+}
 
 try {
-  const exists = await pool.query("select exists(select 1 from pg_database where datname = $1) as exists", [database]);
-  if (!exists.rows[0]?.exists) {
-    await pool.query(`create database "${database}"`);
+  await cluster.start();
+} catch (error) {
+  if (await waitForPostgres(2).catch(() => false)) {
+    await ensureDatabase();
+    console.log(`Embedded PostgreSQL already running on postgresql://${host}:${port}/${database}`);
+    process.exit(0);
   }
-} finally {
-  await pool.end();
+
+  throw error;
 }
+
+await waitForPostgres();
+await ensureDatabase();
 
 console.log(`Embedded PostgreSQL ready on postgresql://${host}:${port}/${database}`);
 
